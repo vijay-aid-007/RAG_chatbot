@@ -1,0 +1,43 @@
+{
+  "habits": [
+    "reading",
+    "playing video games",
+    "cooking",
+    "gardening",
+    "going on hikes and camping trips",
+    "watching movies",
+    "listening to music",
+    "riding bikes",
+    "swimming",
+    "fishing",
+    "boating"
+  ],
+  "personal_facts": [
+    "has two dogs named Jack and Max",
+    "is a stay-at-home mom with three kids",
+    "is a circus juggler from the midwest",
+    "has a husband",
+    "is not very tech savvy",
+    "is trying to learn more about technology",
+    "works at a hair salon",
+    "is a cosplayer"
+  ],
+  "personality_traits": [
+    "loves to help others",
+    "enjoys trying new things",
+    "values family and friendships",
+    "is enthusiastic about various activities",
+    "appreciates the outdoors",
+    "has a sense of humor"
+  ],
+  "communication_style": {
+    "message_length": "short|medium",
+    "tone": "casual",
+    "emoji_usage": "none",
+    "notable_patterns": [
+      "often expresses excitement and enthusiasm",
+      "asks questions to show interest",
+      "shares personal experiences and hobbies"
+    ]
+  }
+}
