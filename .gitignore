@@ -1,0 +1,25 @@
+# Environment
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# Storage (large generated files — don't commit)
+storage/
+*.index
+*.jsonl
+
+# Gradio temp
+gradio_cached_examples/
+flagged/
+
+# IDE
+.vscode/
+.idea/
+*.DS_Store

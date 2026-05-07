@@ -1,0 +1,24 @@
+# Core NLP & Embeddings
+sentence-transformers==2.7.0
+scikit-learn==1.4.2
+numpy==1.26.4
+ 
+# Vector Store
+faiss-cpu==1.8.0
+ 
+# LLM API
+groq==0.9.0
+ 
+# Web Framework
+fastapi==0.111.0
+uvicorn==0.30.1
+ 
+# Data handling
+pandas==2.2.2
+ 
+# Frontend (Gradio chatbot UI)
+gradio==4.36.1
+ 
+# Utilities
+python-dotenv==1.0.1
+tqdm==4.66.4
