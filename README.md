@@ -5,8 +5,7 @@ A production-ready Retrieval-Augmented Generation (RAG) system that processes a 
 ---
 
 ## Live Demo
-🔗 **Chatbot URL:** https://huggingface.co/spaces/vijay036/rag_chatbot
-
+🔗 **Chatbot URL:** https://huggingface.co/spaces/vijay036/rag_chatbot 
 🎥 **Video Demo:** [ADD YOUR LOOM URL HERE]  
 💻 **GitHub:** https://github.com/vijay-aid-007/RAG_chatbot
 
