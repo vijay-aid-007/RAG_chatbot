@@ -6,13 +6,6 @@ the persona (Part 2) to answer natural-language questions.
 
 Public function:
     answer(user_question: str) -> str
-
-The bot:
-    1. Decides if the query is persona-focused or conversation-focused.
-    2. Retrieves relevant context from the RAG system.
-    3. Loads the persona JSON.
-    4. Constructs a well-structured prompt and calls Groq LLM.
-    5. Returns a plain-text answer.
 """
 
 from __future__ import annotations
@@ -22,8 +15,7 @@ from groq import Groq
 
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from config import GROQ_API_KEY, LLM_MODEL, LLM_MAX_TOKENS
-from core.retriever import retrieve
+from config import GROQ_API_KEY, LLM_MODEL, LLM_MAX_TOKENS, TOPIC_CHECKPOINTS
 from core.persona_extractor import load_persona
 
 
@@ -53,38 +45,75 @@ ANSWER_PROMPT = """
 """
 
 
-# ── Intent classifier ─────────────────────────────────────────────────────────
+# ── Safe retrieval (handles missing FAISS gracefully) ─────────────────────────
 
-_PERSONA_KEYWORDS = {
-    "person", "who", "habit", "hobby", "personality", "trait",
-    "talk", "speak", "communicate", "emoji", "tone", "style",
-    "kind of", "type of", "character", "feel", "emotion",
-    "relationship", "family", "work", "job", "career", "sleep",
-    "food", "diet", "pet", "interest", "like", "love", "enjoy",
-}
+def _safe_retrieve(question: str) -> str:
+    """
+    Try full RAG retrieval. If FAISS index is missing,
+    fall back to topic summaries + persona only.
+    """
+    # Try full retrieval first
+    try:
+        from core.retriever import retrieve
+        result = retrieve(question)
+        return result["combined_context"]
+    except Exception as faiss_err:
+        if "FAISS" in str(faiss_err) or "faiss" in str(faiss_err) or "not found" in str(faiss_err):
+            # Fallback: use topic summaries only
+            return _retrieve_topics_only(question)
+        raise
 
-def _is_persona_query(question: str) -> bool:
-    """True if the question seems persona/user-profile oriented."""
-    lower = question.lower()
-    return any(kw in lower for kw in _PERSONA_KEYWORDS)
+
+def _retrieve_topics_only(question: str) -> str:
+    """
+    Fallback retrieval using only topic checkpoints (no FAISS needed).
+    Returns top matching topic summaries based on keyword overlap.
+    """
+    try:
+        if not TOPIC_CHECKPOINTS.exists():
+            return "No context available."
+
+        with open(TOPIC_CHECKPOINTS, encoding="utf-8") as fh:
+            topics = json.load(fh)
+
+        # Simple keyword-based scoring
+        question_words = set(question.lower().split())
+        scored = []
+        for t in topics:
+            summary = t.get("summary", "")
+            if not summary:
+                continue
+            summary_words = set(summary.lower().split())
+            score = len(question_words & summary_words)
+            scored.append((score, t))
+
+        # Sort by score and take top 5
+        scored.sort(key=lambda x: x[0], reverse=True)
+        top = scored[:5]
+
+        context_parts = ["=== RELEVANT TOPIC SUMMARIES ==="]
+        for score, t in top:
+            context_parts.append(
+                f"[Topic {t.get('topic_id', '?')} | "
+                f"msgs {t.get('start_msg_id', '?')}–{t.get('end_msg_id', '?')}]\n"
+                f"{t['summary']}"
+            )
+
+        return "\n\n".join(context_parts)
+
+    except Exception as e:
+        return f"Context retrieval failed: {e}"
 
 
-# ── Core answer function ──────────────────────────────────────────────────────
+# ── Core answer function ───────────────────────────────────────────────────────
 
 def answer(user_question: str, verbose: bool = False) -> str:
     """
     Generate an answer to `user_question` using RAG + persona.
-
-    Args:
-        user_question : natural language question from the user
-        verbose       : if True, print retrieved context to stdout
-
-    Returns:
-        Plain-text answer string.
+    Falls back gracefully if FAISS index is unavailable.
     """
-    # 1. Retrieve RAG context
-    retrieval = retrieve(user_question)
-    rag_context = retrieval["combined_context"]
+    # 1. Retrieve context (with fallback)
+    rag_context = _safe_retrieve(user_question)
 
     if verbose:
         print("\n── RAG Context ──────────────────────────────")
@@ -96,7 +125,7 @@ def answer(user_question: str, verbose: bool = False) -> str:
         persona = load_persona()
         persona_str = json.dumps(persona, indent=2, ensure_ascii=False)
     except FileNotFoundError:
-        persona_str = "Persona not available. Run the build pipeline first."
+        persona_str = "Persona not available."
 
     # 3. Build prompt
     prompt = ANSWER_PROMPT.format(
