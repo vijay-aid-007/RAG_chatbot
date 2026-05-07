@@ -7,7 +7,7 @@ A production-ready Retrieval-Augmented Generation (RAG) system that processes a 
 ## Live Demo
 🔗 **Chatbot URL:** [ADD YOUR CLOUD URL HERE]  
 🎥 **Video Demo:** [ADD YOUR LOOM URL HERE]  
-💻 **GitHub:** [ADD YOUR GITHUB URL HERE]
+💻 **GitHub:** https://github.com/vijay-aid-007/RAG_chatbot
 
 ---
 
@@ -192,7 +192,7 @@ rag_chatbot/
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/YOUR_USERNAME/rag-chatbot.git
+git clone https://github.com/vijay-aid-007/RAG_chatbot
 cd rag-chatbot
 
 # 2. Create a virtual environment
@@ -257,7 +257,7 @@ Opens at `http://localhost:7860`
 1. Go to [huggingface.co](https://huggingface.co) → New Space → Gradio SDK
 2. Upload all project files
 3. Go to Space Settings → Secrets → add `GROQ_API_KEY`
-4. Upload your pre-built `storage/` folder (FAISS index + checkpoints + persona)
+4. Upload pre-built `storage/` folder (FAISS index + checkpoints + persona)
 
 ### Railway / Render
 1. Connect your GitHub repo
@@ -294,4 +294,4 @@ All parameters are in `config.py`:
 | `TOP_K_CHUNKS` | `5` | Chunks returned per query |
 | `TOP_K_TOPICS` | `3` | Topic summaries returned per query |
 | `LLM_MODEL` | `llama-3.3-70b-versatile` | Groq model used for all LLM calls |
-| `GROQ_API_KEY` | from `.env` | Your Groq API key |
+| `GROQ_API_KEY` | from `.env` | Groq API key |
